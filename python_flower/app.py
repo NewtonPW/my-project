@@ -9,7 +9,7 @@ app = Flask(__name__)
 # ตั้งค่าโฟลเดอร์สำหรับเก็บรูปภาพที่อัปโหลด (ถ้าไม่มีให้สร้างอัตโนมัติ)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
+# Hiii2
 app.secret_key = 'super_secret_cat_flower_key'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///shop.db'
