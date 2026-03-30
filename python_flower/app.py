@@ -4,14 +4,13 @@ import os
 from werkzeug.utils import secure_filename
 from billing import Product, CartItem, WholesaleOrder
 import uuid
-# Hiiiiiiii
+
 app = Flask(__name__)
 # ตั้งค่าโฟลเดอร์สำหรับเก็บรูปภาพที่อัปโหลด (ถ้าไม่มีให้สร้างอัตโนมัติ)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-# Hiii
+
 app.secret_key = 'super_secret_cat_flower_key'
-# 67
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///shop.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app) # สั่งให้ Flask รู้จักกับ db
