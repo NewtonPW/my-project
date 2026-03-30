@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flora Haven - เกี่ยวกับเรา</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #FFF9F5; }
+        .navbar { background-color: #F08A00; color: white; padding: 15px 0; text-align: center; font-weight: bold; font-size: 14px; }
+        .navbar a { color: white; text-decoration: none; margin: 0 15px; }
+        .navbar a:hover { text-decoration: underline; }
+        
+        /* ส่วนหัวของหน้า (Hero Section) */
+        .hero { background-color: #1A2B1C; color: white; text-align: center; padding: 60px 20px; position: relative; overflow: hidden; }
+        .hero h1 { font-size: 36px; margin-bottom: 10px; color: #F08A00; }
+        .hero p { font-size: 16px; color: #ddd; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+        
+        /* ของตกแต่ง */
+        .flower-dec { position: absolute; font-size: 40px; opacity: 0.3; }
+        .dec-1 { top: 20px; left: 10%; } .dec-2 { bottom: 20px; right: 10%; }
+
+        /* ส่วนเนื้อหาหลัก */
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; text-align: center; }
+        .story-section { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 40px; line-height: 1.8; color: #444; }
+        
+        /* การ์ดจุดเด่น */
+        .features { display: flex; gap: 20px; justify-content: space-between; }
+        .feature-card { flex: 1; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); text-align: center; transition: 0.3s; border-top: 4px solid #F08A00; }
+        .feature-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .feature-icon { font-size: 40px; margin-bottom: 15px; }
+        .feature-card h3 { color: #1A2B1C; margin-bottom: 10px; }
+        .feature-card p { font-size: 14px; color: #666; line-height: 1.6; }
+        /* =========================================
+           สไตล์สำหรับ ไอคอน User และ Dropdown เมนู
+           ========================================= */
+        .user-dropdown {
+            position: relative;
+            display: inline-block;
+            margin-left: 15px;
+        }
+        
+        .user-icon-btn {
+            background-color: transparent;
+            color: white; /* หรือสีที่คุณใช้ใน Navbar */
+            font-size: 24px;
+            border: none;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 50%;
+            transition: background 0.3s;
+        }
+        
+        .user-icon-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .dropdown-content {
+            display: none; /* ซ่อนไว้ก่อน */
+            position: absolute;
+            right: 0; /* ให้ชิดขวาของไอคอน */
+            background-color: #ffffff;
+            min-width: 180px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.15);
+            z-index: 1000;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+
+        /* โชว์เมนูเมื่อเอาเมาส์ไปชี้ที่พื้นที่ dropdown */
+        .user-dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+            font-size: 14px;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f9f9f9;
+            color: #e74c3c;
+        }
+        
+        .dropdown-header {
+            padding: 15px 16px;
+            background: #ffebee;
+            color: #c62828;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 2px solid #ffcdd2;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 30px;">
+        
+        <div class="nav-left">
+            <a href="/about">Flora Haven หน้าหลัก</a> |
+            <a href="/shop" style="color: white; font-weight: bold;">🛒 เลือกซื้อดอกไม้</a> |
+            <a href="/contact">ติดต่อเรา</a>
+        </div>
+        
+        <div class="nav-right" style="display: flex; align-items: center;">
+            
+            <a href="javascript:void(0)" class="cart-icon" onclick="toggleCartDrawer()" style="position: relative; color: white; text-decoration: none; font-size: 1.2em; margin-right: 20px;">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-badge" style="position: absolute; top: -10px; right: -12px; background-color: #e74c3c; color: white; border-radius: 50%; padding: 2px 6px; font-size: 12px; font-weight: bold; line-height: 1;">{{ cart_total_items }}</span>
+            </a>
+            
+            <div class="user-dropdown">
+                <button class="user-icon-btn">👤</button> <div class="dropdown-content">
+                    {% if 'username' in session %}
+                        <div class="dropdown-header">
+                            <div style="font-size: 30px;">🧑‍💼</div>
+                            สวัสดีคุณ {{ session['username'] }}
+                        </div>
+                        
+                        {% if session.get('role') == 'Administrator' %}
+                            <a href="/manage_orders">⚙️ จัดการระบบร้าน (Admin)</a>
+                        {% endif %}
+                        
+                        <a href="/logout" style="color: #e74c3c; font-weight: bold;">🚪 ออกจากระบบ</a>
+                        
+                    {% else %}
+                        <div class="dropdown-header" style="background: #f1f1f1; color: #555; border-color: #ddd;">
+                            ยินดีต้อนรับ!
+                        </div>
+                        <a href="/login">🔑 เข้าสู่ระบบ</a>
+                        <a href="/register">📝 สมัครสมาชิก</a>
+                    {% endif %}
+                </div>
+            </div>
+            </div>
+    </div>
+
+    <div class="hero">
+        <div class="flower-dec dec-1">🌿</div>
+        <div class="flower-dec dec-2">🌷</div>
+        <h1>เกี่ยวกับ Flora Haven</h1>
+        <p>เพราะเราเชื่อว่า "ดอกไม้" คือภาษาที่สวยงามที่สุดในการส่งต่อความรู้สึกดีๆ ให้แก่กัน</p>
+    </div>
+
+    <div class="container">
+        <div class="story-section">
+            <h2 style="color: #1A2B1C;">เรื่องราวของเรา 🌸</h2>
+            <p>
+                Flora Haven เริ่มต้นจากความหลงใหลในความงามของธรรมชาติและการจัดดอกไม้ เราตั้งใจคัดสรรดอกไม้ที่สดใหม่ที่สุดจากฟาร์มที่ใส่ใจสิ่งแวดล้อม เพื่อนำมารังสรรค์เป็นช่อดอกไม้ แจกัน และกล่องของขวัญที่เต็มไปด้วยความหมาย ไม่ว่าจะเป็นวันเกิด วันครบรอบ หรือวันธรรมดาที่คุณอยากทำให้เป็นวันพิเศษ เราพร้อมเป็นตัวแทนส่งมอบรอยยิ้มให้กับคนที่คุณรัก
+            </p>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🌱</div>
+                <h3>สดใหม่ทุกวัน</h3>
+                <p>คัดสรรดอกไม้เกรดพรีเมียม ส่งตรงจากฟาร์มถึงมือคุณ รับประกันความสดใหม่</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3>ดีไซน์เอกลักษณ์</h3>
+                <p>จัดช่อโดยช่างจัดดอกไม้มืออาชีพ ที่ใส่ใจทุกรายละเอียดและคู่สี</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🚚</div>
+                <h3>ส่งมอบตรงเวลา</h3>
+                <p>บริการจัดส่งอย่างระมัดระวัง เพื่อให้ดอกไม้ถึงมือผู้รับในสภาพที่สมบูรณ์ที่สุด</p>
+            </div>
+        </div>
+    </div>
+    <style>
+    /* พื้นหลังที่เบลอเวลาตะกร้าเปิด */
+    .cart-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; display: none;}
+    
+    /* แผงตะกร้าสินค้า (เริ่มแรกซ่อนอยู่ทางขวา) */
+    .cart-drawer { position: fixed; top: 0; right: -380px; width: 350px; height: 100%; background: white; z-index: 1002; transition: 0.3s; padding: 20px; display: flex; flex-direction: column; border-left: 1px solid #ddd;}
+    .cart-drawer.open { right: 0; }
+    
+    /* หัวตะกร้าและปุ่มปิด */
+    .cart-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 10px;}
+    .cart-title { color: #d9534f; font-weight: bold; font-size: 18px; margin: 0; }
+    .close-cart-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #555; }
+    
+    /* ส่วนรายการสินค้า */
+    .cart-items-list { flex-grow: 1; overflow-y: auto; margin-top: 20px; padding-right: 5px; }
+    .cart-item { display: flex; gap: 15px; border-bottom: 1px solid #eee; padding: 15px 0; align-items: center;}
+    .cart-item-img { width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd;}
+    .cart-item-details { flex-grow: 1; }
+    .cart-item-name { font-weight: bold; font-size: 14px; margin: 0; color: #333;}
+    .cart-item-price { color: #d32f2f; font-weight: bold; font-size: 13px; margin: 5px 0; }
+    
+    /* ปุ่ม + / - และ ไอคอนถังขยะ */
+    .cart-qty-controls { display: flex; align-items: center; gap: 8px; margin-top: 10px;}
+    .qty-btn { background-color: #fce4e4; border: 1px solid #d9534f; color: #d9534f; border-radius: 4px; padding: 2px 7px; cursor: pointer; font-weight: bold;}
+    .qty-display { font-size: 14px; font-weight: bold; width: 25px; text-align: center;}
+    .remove-item-icon { color: #ff4d4d; cursor: pointer; background: none; border: none; padding: 0;}
+    
+    /* ส่วนยอดรวมและปุ่มชำระเงิน */
+    .cart-footer { border-top: 2px solid #ddd; padding-top: 20px; margin-top: 10px;}
+    .total-row { display: flex; justify-content: space-between; font-weight: bold; font-size: 16px; margin-bottom: 20px;}
+    .btn-checkout { background-color: #d9534f; color: white; width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s;}
+    .btn-checkout:hover { background-color: #c9302c; }
+    
+    /* สไตล์สำหรับ Badge ตัวเลขบนไอคอน */
+    .cart-badge { position: absolute; top: -8px; right: -12px; background-color: #d32f2f; color: white; border-radius: 50%; padding: 2px 6px; font-size: 11px; font-weight: bold; }
+</style>
+
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCartDrawer()"></div>
+<div class="cart-drawer" id="cartDrawer">
+    <div class="cart-header">
+        <h3 class="cart-title">ตะกร้าสินค้า ({{ cart_total_items }})</h3>
+        <button class="close-cart-btn" onclick="toggleCartDrawer()">×</button>
+    </div>
+    
+    <div class="cart-items-list">
+        {% for item in cart_items_details %}
+        <div class="cart-item">
+            <img src="{{ url_for('static', filename='uploads/' + item.flower.image_file) }}" class="cart-item-img">
+            
+            <div class="cart-item-details">
+                <h4 class="cart-item-name">{{ item.flower.name }}</h4>
+                <p class="cart-item-price">฿{{ item.flower.price }} / ดอก</p>
+                
+                <div class="cart-actions-row" style="display: flex; justify-content: space-between; align-items: center;">
+                    <form action="/update_cart_quantity/{{ item.flower.id }}" method="POST" class="cart-qty-controls">
+                        <button name="action" value="decrease" class="qty-btn">-</button>
+                        <span class="qty-display">{{ item.quantity }}</span>
+                        <button name="action" value="increase" class="qty-btn">+</button>
+                    </form>
+                    <a href="/remove_from_cart/{{ item.flower.id }}" class="remove-item-icon">🗑️</a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div style="text-align: center; color: #888; padding-top: 50px;">
+            ตะกร้าสินค้ายังว่างอยู่ หยิบสักดอกไหมครับ? 🌸
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="cart-footer">
+        <div class="total-row">
+            <span>รวม:</span>
+            <span style="color: #d32f2f; font-size: 18px;">฿{{ cart_total_price }}</span>
+        </div>
+        <a href="/checkout" class="btn-checkout" style="display: block; text-align: center; text-decoration: none;">💵 ชำระเงิน</a>
+    </div>
+</div>
+
+<script>
+    function toggleCartDrawer() {
+        const drawer = document.getElementById('cartDrawer');
+        const overlay = document.getElementById('cartOverlay');
+        drawer.classList.toggle('open');
+        overlay.style.display = drawer.classList.contains('open') ? 'block' : 'none';
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>จัดการคำสั่งซื้อ | Flora Admin</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; display: flex; }
+        
+        /* เมนูด้านซ้าย (ใช้แบบเดียวกับหน้าแอดมินอื่นๆ) */
+        .sidebar { width: 250px; background-color: #2c3e50; color: white; height: 100vh; padding: 20px; position: sticky; top: 0; }
+        .sidebar a { display: block; color: white; text-decoration: none; padding: 10px; margin: 5px 0; border-radius: 5px; }
+        .sidebar a:hover { background-color: #34495e; }
+        .sidebar .active { background-color: #e74c3c; font-weight: bold; }
+        
+        .main-content { flex: 1; padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 15px; margin-bottom: 20px;}
+        
+        /* สไตล์ตารางคำสั่งซื้อ */
+        table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f8f9fa; color: #333; }
+        tr:hover { background-color: #f1f2f6; }
+        
+        .status-badge { padding: 5px 10px; border-radius: 15px; font-size: 13px; font-weight: bold; color: white;}
+        .status-รอจัดส่ง { background-color: #f1c40f; color: #333;}
+        .status-จัดส่งแล้ว { background-color: #2ecc71; }
+        .status-ยกเลิก { background-color: #e74c3c; }
+        
+        select { padding: 5px; border-radius: 5px; border: 1px solid #ccc; }
+        .btn-update { background-color: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 5px; cursor: pointer; }
+        .btn-update:hover { background-color: #2980b9; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h3 style="color: #e74c3c; text-align: center;">🌸 Flora Admin</h3>
+        <a href="/admin">เพิ่มดอกไม้ใหม่</a>
+        <a href="/manage_stock">จัดการสต็อกดอกไม้</a>
+        <a href="/manage_orders" class="active">📦 จัดการคำสั่งซื้อ</a>
+        
+        <div style="margin-top: 20px; border-top: 1px solid #444; padding-top: 20px;">
+            <a href="/shop" target="_blank" style="color: #2ecc71;">🌍 ดูหน้าร้าน (ลูกค้า)</a>
+        </div>
+        <div style="margin-top: 50px;">
+            <a href="/logout" style="color: #f39c12;">🔓 ออกจากระบบ</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h2 style="margin: 0; color: #333;">📦 รายการคำสั่งซื้อทั้งหมด</h2>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>รหัสบิล</th>
+                    <th>ชื่อลูกค้า</th>
+                    <th>เบอร์โทร</th>
+                    <th>วิธีชำระเงิน</th>
+                    <th>ราคารวม</th>
+                    <th>สถานะปัจจุบัน</th>
+                    <th>อัปเดตสถานะ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for bill in bills %}
+                <tr>
+                    <td>#{{ bill.id }}</td>
+                    <td><b>{{ bill.customer_name }}</b></td>
+                    <td>{{ bill.phone }}</td>
+                    <td>{{ bill.payment_method }}</td>
+                    <td>{{ bill.total_price }} บาท</td>
+                    <td>
+                        <span style="background-color: #ffc107; color: #000; padding: 5px 12px; border-radius: 20px; font-size: 14px; font-weight: bold;">
+            {{ bill.status }}</span>
+                    </td>
+                    <td>
+                        <form action="/update_order_status/{{ bill.id }}" method="POST" style="display: flex; gap: 5px;">
+                            <select name="status">
+                                <option value="รอจัดส่ง" {% if bill.status == 'รอจัดส่ง' %}selected{% endif %}>รอจัดส่ง</option>
+                                <option value="จัดส่งแล้ว" {% if bill.status == 'จัดส่งแล้ว' %}selected{% endif %}>จัดส่งแล้ว</option>
+                                <option value="ยกเลิก" {% if bill.status == 'ยกเลิก' %}selected{% endif %}>ยกเลิก</option>
+                            </select>
+                            <button type="submit" class="btn-update">บันทึก</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 30px; color: #888;">ยังไม่มีคำสั่งซื้อเข้ามาเลยครับ 🥀</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>ชำระเงิน | Flora Haven</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f9f9f9; padding: 40px; }
+        .checkout-container { display: flex; max-width: 1000px; margin: auto; gap: 30px; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .order-summary { flex: 1; border-right: 2px solid #eee; padding-right: 30px; }
+        .checkout-form { flex: 1; padding-left: 10px; }
+        
+        h2 { color: #d32f2f; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .item-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #ddd; }
+        .total-price { font-size: 20px; font-weight: bold; color: #d32f2f; text-align: right; margin-top: 20px; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; box-sizing: border-box; }
+        
+        .payment-methods { background: #fdf2f2; padding: 15px; border-radius: 5px; border: 1px solid #f5c6c6; margin-bottom: 20px;}
+        .payment-methods label { display: block; margin-bottom: 10px; font-weight: normal; cursor: pointer; }
+        
+        .btn-submit { background-color: #d32f2f; color: white; border: none; padding: 15px; width: 100%; border-radius: 5px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-submit:hover { background-color: #b71c1c; }
+    </style>
+</head>
+<body>
+
+    <div class="checkout-container">
+        
+        <div class="order-summary">
+            <h2>🛒 สรุปรายการคำสั่งซื้อ</h2>
+            
+            {% for item in cart_items_details %}
+            <div class="item-row">
+                <span>{{ item.flower.name }} (x{{ item.quantity }})</span>
+                <span>฿{{ item.subtotal }}</span>
+            </div>
+            {% endfor %}
+            
+            <div class="total-price">
+                ยอดรวมทั้งสิ้น: ฿{{ cart_total_price }}
+            </div>
+            
+            <p style="font-size: 14px; color: #2e7d32; text-align: right; margin-top: 5px; margin-bottom: 0;">
+                *สั่งซื้อ 10 ชิ้นขึ้นไป ส่วนลด 10% ✨
+            </p>
+            </div>
+
+        <div class="checkout-form">
+            <h2>📍 ข้อมูลจัดส่งและชำระเงิน</h2>
+            <form action="/checkout" method="POST">
+                
+                <div class="form-group">
+                    <label>ชื่อ-นามสกุล ผู้รับ:</label>
+                    <input type="text" name="fullname" value="{{ user.fullname }}" required placeholder="เช่น นายสมชาย ใจดี">
+                </div>
+                
+                <div class="form-group">
+                    <label>เบอร์โทรศัพท์:</label>
+                    <input type="tel" name="phone" value="{{ user.phone if user.phone else '' }}" required placeholder="08X-XXX-XXXX">
+                </div>
+                
+                <div class="form-group">
+                    <label>ที่อยู่สำหรับจัดส่ง:</label>
+                    <textarea name="address" rows="4" required placeholder="บ้านเลขที่...">{{ user.address if user.address else '' }}</textarea>
+                </div>
+
+                <div class="payment-methods">
+                    <label style="font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">💳 เลือกวิธีชำระเงิน:</label>
+                    <label>
+                        <input type="radio" name="payment_method" value="โอนเงิน/สแกน QR" required> 📱 โอนเงิน / สแกน QR Code
+                    </label>
+                    <label>
+                        <input type="radio" name="payment_method" value="เก็บเงินปลายทาง" required> 🚚 ชำระเงินปลายทาง (COD)
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-submit">✅ ยืนยันคำสั่งซื้อ</button>
+            </form>
+        </div>
+
+    </div>
+
+</body>
+</html>

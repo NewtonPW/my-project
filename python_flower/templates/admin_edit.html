@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แก้ไขข้อมูลดอกไม้ - Admin</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f9f9f9; margin: 0; display: flex; height: 100vh; }
+        .sidebar { width: 250px; background-color: #ffffff; padding: 30px 20px; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
+        .menu-item { display: block; padding: 15px 20px; margin-bottom: 10px; color: #555; text-decoration: none; border-radius: 10px; transition: 0.3s; }
+        .menu-item:hover, .menu-item.active { background-color: #fce4e4; color: #d9534f; font-weight: bold; }
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; }
+        .card { background-color: #ffffff; border-radius: 15px; padding: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 900px; margin: 0 auto; }
+        .page-title { text-align: left; color: #d9534f; margin-bottom: 20px; border-bottom: 2px solid #d9534f; padding-bottom: 10px;}
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; }
+        label { font-size: 14px; color: #d9534f; margin-bottom: 8px; font-weight: bold; }
+        input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; }
+        .btn-submit { grid-column: span 2; background-color: #d9534f; color: white; padding: 15px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px;}
+        .btn-submit:hover { background-color: #c9302c; }
+        .current-img { width: 150px; border-radius: 8px; border: 1px solid #ddd; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h3 style="color: #d9534f; text-align: center;">🌸 Flora Admin</h3>
+        <a href="/admin" class="menu-item">เพิ่มดอกไม้ใหม่</a>
+        <a href="/manage_stock" class="menu-item active">จัดการสต็อกดอกไม้</a>
+        <a href="/manage_orders" class="menu-item">จัดการคำสั่งซื้อ</a>
+        <div style="margin-top: 50px;">
+            <a href="/login" class="menu-item" style="color: #f39c12;">🔓 ออกจากระบบ</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="card">
+            <a href="/manage_stock" style="color: #d9534f; text-decoration: none; font-weight: bold;">← กลับไปยังหน้าจัดการสต็อก</a>
+            <h2 class="page-title" style="margin-top: 15px;">แก้ไขข้อมูลดอกไม้</h2>
+            
+            <form action="/edit_flower/{{ flower.id }}" method="POST" enctype="multipart/form-data">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>ชื่อดอกไม้ *</label>
+                        <input type="text" name="name" value="{{ flower.name }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>วันที่นำเข้าสต็อก</label>
+                        <input type="date" name="stock_date" value="{{ flower.stock_date }}">
+                    </div>
+                    <div class="form-group">
+                        <label>สี</label>
+                        <input type="text" name="color" value="{{ flower.color }}">
+                    </div>
+                    <div class="form-group">
+                        <label>ราคาต่อหน่วย (บาท) *</label>
+                        <input type="number" name="price" value="{{ flower.price }}" required>
+                    </div>
+                    
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>รูปภาพปัจจุบัน:</label>
+                        <img src="{{ url_for('static', filename='uploads/' + flower.image_file) }}" class="current-img">
+                        <label>อัปโหลดรูปใหม่ (เว้นว่างไว้ถ้าใช้รูปเดิม):</label>
+                        <input type="file" name="image" accept="image/*">
+                    </div>
+
+                    <button type="submit" class="btn-submit">บันทึกการแก้ไข</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
