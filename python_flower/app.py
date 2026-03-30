@@ -4,7 +4,7 @@ import os
 from werkzeug.utils import secure_filename
 from billing import Product, CartItem, WholesaleOrder
 import uuid
-
+# Hii
 app = Flask(__name__)
 # ตั้งค่าโฟลเดอร์สำหรับเก็บรูปภาพที่อัปโหลด (ถ้าไม่มีให้สร้างอัตโนมัติ)
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
