@@ -1,60 +1,89 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session
-from models import db, Flower
-from werkzeug.utils import secure_filename
-import os
-import uuid
+from flask import session, request, redirect, url_for
+from models import Flower
+from billing import CartItem, WholesaleOrder, Flower as OOPFlower
 
-flower_bp = Blueprint('flower', __name__)
+def inject_cart():
+    """🌟 Context processor สำหรับส่งข้อมูลตะกร้าไปให้ HTML"""
+    cart = session.get('cart', {})
+    cart_items_details = []
+    total_items_in_cart = 0
+    
+    my_order = WholesaleOrder("ลูกค้าทั่วไป")
 
-@flower_bp.route('/add_flower', methods=['POST'])
-def add_flower():
-    if request.method == 'POST':
-        new_name = request.form.get('name')
-        new_date = request.form.get('stock_date')
-        new_color = request.form.get('color')
-        new_price = request.form.get('price')
-        image_file = request.files.get('image')
-        filename = 'default.jpg'
-        if image_file and image_file.filename != '':
-            filename = secure_filename(image_file.filename)
-            image_file.save(os.path.join('static/uploads', filename))
-        new_flower = Flower(
-            name=new_name,
-            stock_date=new_date,
-            color=new_color,
-            price=float(new_price),
-            image_file=filename
-        )
-        db.session.add(new_flower)
-        db.session.commit()
-        return render_template('admin.html', success_msg="เพิ่มดอกไม้เข้าสต็อกสำเร็จ! 🎉")
+    if cart:
+        for product_id_str, quantity in cart.items():
+            flower_db = Flower.query.get(int(product_id_str))
+            
+            if flower_db:
+                qty = int(quantity)
+                total_items_in_cart += qty
+                
+                oop_flower = OOPFlower(
+                    name=flower_db.name,
+                    price=flower_db.price,
+                    color=flower_db.color,
+                    meaning="ดอกไม้สื่อความหมายดีๆ"
+                )
+                
+                item_oop = CartItem(product=oop_flower, quantity=qty)
+                my_order.add_item(item_oop)
+                
+                cart_items_details.append({
+                    'flower': flower_db,
+                    'quantity': qty,
+                    'subtotal': item_oop.get_subtotal() 
+                })
+    
+    return dict(
+        cart_items_details=cart_items_details, 
+        cart_total_price=my_order.calculate_total(), 
+        cart_total_items=total_items_in_cart
+    )
 
-@flower_bp.route('/delete_flower/<int:id>', methods=['POST'])
-def delete_flower(id):
-    flower_to_delete = Flower.query.get_or_404(id)
-    db.session.delete(flower_to_delete)
-    db.session.commit()
-    return redirect(url_for('manage_stock'))
+def register_cart_routes(app):
+    @app.route('/add_to_cart/<int:product_id>', methods=['POST'])
+    def add_to_cart(product_id):
+        Flower.query.get_or_404(product_id)
+        cart = session.get('cart', {})
+        pid_str = str(product_id)
+        
+        if pid_str in cart:
+            cart[pid_str] += 1
+        else:
+            cart[pid_str] = 1
+        
+        session['cart'] = cart
+        session.modified = True
+        return redirect(request.referrer or url_for('shop_page'))
 
-@flower_bp.route('/edit_flower/<int:id>', methods=['GET', 'POST'])
-def edit_flower(id):
-    flower_to_edit = Flower.query.get_or_404(id)
-    if request.method == 'POST':
-        flower_to_edit.name = request.form['name']
-        flower_to_edit.stock_date = request.form['stock_date']
-        flower_to_edit.color = request.form['color']
-        flower_to_edit.price = request.form['price']
-        file = request.files['image']
-        if file and file.filename != '':
-            filename = secure_filename(file.filename)
-            pic_name = str(uuid.uuid1()) + "_" + filename
-            file.save(os.path.join('static/uploads', pic_name))
-            flower_to_edit.image_file = pic_name
-        db.session.commit()
-        return redirect(url_for('manage_stock'))
-    return render_template('admin_edit.html', flower=flower_to_edit)
+    @app.route('/remove_from_cart/<int:product_id>')
+    def remove_from_cart(product_id):
+        cart = session.get('cart', {})
+        pid_str = str(product_id)
+        
+        if pid_str in cart:
+            del cart[pid_str]
+            session['cart'] = cart
+            session.modified = True
+            
+        return redirect(request.referrer or url_for('shop_page'))
 
-@flower_bp.route('/manage_stock')
-def manage_stock():
-    all_flowers = Flower.query.all()
-    return render_template('admin_stock.html', flowers=all_flowers)
+    @app.route('/update_cart_quantity/<int:product_id>', methods=['POST'])
+    def update_cart_quantity(product_id):
+        cart = session.get('cart', {})
+        pid_str = str(product_id)
+        action = request.form.get('action')
+
+        if pid_str in cart:
+            if action == 'increase':
+                cart[pid_str] += 1
+            elif action == 'decrease':
+                if cart[pid_str] > 1:
+                    cart[pid_str] -= 1
+                else:
+                    del cart[pid_str]
+                    
+            session['cart'] = cart
+            session.modified = True
+            
+        return redirect(request.referrer or url_for('shop_page'))
