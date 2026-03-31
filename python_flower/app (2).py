@@ -440,20 +440,6 @@ def checkout():
     # 🌟 4. ส่งข้อมูลไปหน้า HTML
     return render_template('checkout.html', user=current_user, cart_items_details=cart_items_details, cart_total_price=final_total, total_quantity=total_quantity)
 
-@app.route('/my_orders')
-def my_orders():
-    # เช็คก่อนว่าล็อกอินหรือยัง
-    if 'username' not in session:
-        return redirect(url_for('login'))
-    
-    current_username = session['username'] 
-    
-    current_user_info = User.query.filter_by(username=current_username).first()
-    
-    user_orders = Billing.query.filter_by(customer_name=current_username).all()
-    
-    return render_template('my_orders.html', orders=user_orders, user=current_user_info)
-
 if __name__ == '__main__':
    # --- เพิ่มบล็อกนี้เพื่อเนรมิต Database ก่อนรันเว็บ ---
  with app.app_context():
